@@ -65,10 +65,7 @@ jobs:
 
     - name: Build with Gradle (Release)
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/beta'
-      env:
-            SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-            SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-            VERSION_CODE: ${{ github.run_number }}
+     
       run: ./gradlew :tv:assembleRelease
     
     - name: Build with Gradle (Dev)
@@ -146,28 +143,4 @@ jobs:
         generate_release_notes: true
         prerelease: true
       
-    - name: create gitee release
-      if: github.event_name == 'push' && github.repository == 'mytv-android/mytv-android'
-      id: create_release 
-      uses: nicennnnnnnlee/action-gitee-release@v1.0.5
-      with:
-        gitee_owner: mytv-android
-        gitee_repo: ${{ env.gitee_repo }}
-        gitee_token: ${{ secrets.GITEE_TOKEN }}
-        gitee_tag_name: V${{ env.info_version_name }}
-        gitee_release_name: ${{ env.release_title }}
-        gitee_release_body: ${{ env.changelog }}
-        gitee_target_commitish: master
-
-    - name: upload file to gitee release
-      if: github.event_name == 'push' && github.repository == 'mytv-android/mytv-android'
-      uses: nicennnnnnnlee/action-gitee-release@v1.0.5
-      with:
-        gitee_owner: mytv-android
-        gitee_repo: ${{ env.gitee_repo }}
-        gitee_token: ${{ secrets.GITEE_TOKEN }}
-        gitee_release_id: ${{ steps.create_release.outputs.release-id }}
-        gitee_upload_retry_times:  3
-        gitee_files: |
-            tv/build/outputs/apk/release/*all*original.apk
-
+   
