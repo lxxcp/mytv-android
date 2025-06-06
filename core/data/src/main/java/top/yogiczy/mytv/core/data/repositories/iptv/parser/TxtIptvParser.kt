@@ -26,22 +26,27 @@ class TxtIptvParser : IptvParser {
                 } else {
                     val res = line.split(",", "，")
                     if (res.size < 2) return@forEach
-                    channelList.addAll(res[1].split("#").map { url ->
-                        if (url.startsWith("webview://")) {
+
+                    val rawUrls = res[1].trim()
+                    
+                    // 根据前缀判断是否分割
+                    val urls = if (rawUrls.startsWith("webview://")) {
+                        listOf(rawUrls)
+                    } else {
+                        rawUrls.split("#").map { it.trim() }
+                    }
+
+                    urls.forEach { url ->
+                        if (url.isBlank()) return@forEach
+                        
+                        channelList.add(
                             IptvParser.ChannelItem(
                                 name = res[0].trim(),
                                 groupName = groupName ?: "其他",
-                                url = url.trim(), 
-                                hybridType = IptvParser.ChannelItem.HybridType.WebView,
-                            ) 
-                        }else{
-                            IptvParser.ChannelItem(
-                                name = res[0].trim(),
-                                groupName = groupName ?: "其他",
-                                url = url.trim(),
+                                url = url,
                             )
-                        }
-                    })
+                        )
+                    }
                 }
             }
 
